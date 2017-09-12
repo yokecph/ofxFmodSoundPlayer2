@@ -8,7 +8,6 @@ static float fftInterpValues_[8192];
 static float fftSpectrum_[8192]; // maximum #ofxFmodSoundPlayer2 is 8192, in fmodex....
 static unsigned int buffersize = 1024;
 
-// ADDITION:
 static int ofxFmodPreferedDevice = 0;
 static int ofxFmodDevice = 0;
 static int ofxFmodNumDevices = 0;
@@ -97,10 +96,10 @@ float* ofxFmodSoundGetSpectrum(int nBands) {
 			// if I am current band = 0, I care about (0+1) * step, my end pos
 			// if i > endPos, then split i with me and my neighbor
 
-			if (i >= ((currentBand + 1) * step)) {
+			if (i >= (currentBand + 1) * step) {
 
 				// do some fractional thing here...
-				float fraction = ((currentBand + 1) * step) - (i - 1);
+				float fraction = (currentBand + 1) * step - (i - 1);
 				float one_m_fraction = 1 - fraction;
 				fftInterpValues_[currentBand] += fraction * fftValues_[i];
 				currentBand++;
@@ -157,7 +156,7 @@ int ofxFmodGetNumDevices() {
 	return ofxFmodNumDevices;
 }
 
-std::vector<std::string> ofxFmodGetDeviceNames() {
+vector<string> ofxFmodGetDeviceNames() {
 	// Return a vector of strings containing the names of the devices
 	return ofxFmodDeviceNames;
 }
@@ -171,7 +170,7 @@ bool ofxFmodSetDevice(int deviceIndex) {
 		ofxFmodDevice = deviceIndex;
 		return true;
 	}
-	else return false;
+	return false;
 }
 
 // ------------------------------------------------------------
@@ -217,7 +216,7 @@ void ofxFmodSoundPlayer2::initializeFmod() {
 
 			for (int i = 0; i < ofxFmodNumDevices; i++) {
 				char name[256];
-				FMOD_System_GetDriverInfo(sys, i, name, 256, 0);
+				FMOD_System_GetDriverInfo(sys, i, name, 256, nullptr);
 				ofxFmodDeviceNames.push_back(name);
 			}
 
@@ -255,7 +254,7 @@ void ofxFmodSoundPlayer2::initializeFmod() {
 		FMOD_System_SetDriver(sys, ofxFmodDevice);
 		FMOD_System_SetSpeakerMode(sys, FMOD_SPEAKERMODE_7POINT1); // NEW
 
-		FMOD_System_Init(sys, 32, FMOD_INIT_NORMAL, 0); //do we want just 32 channels?
+		FMOD_System_Init(sys, 32, FMOD_INIT_NORMAL, nullptr); //do we want just 32 channels?
 		FMOD_System_GetMasterChannelGroup(sys, &channelgroup);
 		bFmodInitialized_ = true;
 	}
@@ -294,7 +293,7 @@ bool ofxFmodSoundPlayer2::load(string fileName, bool stream) {
 	// & prevent user-created memory leaks
 	// if they call "loadSound" repeatedly, for example
 
-	unload();
+	//unload();
 
 	// [3] load sound
 
@@ -302,7 +301,7 @@ bool ofxFmodSoundPlayer2::load(string fileName, bool stream) {
 	int fmodFlags = FMOD_SOFTWARE;
 	if (stream) fmodFlags = FMOD_SOFTWARE | FMOD_CREATESTREAM;
 
-	result = FMOD_System_CreateSound(sys, fileName.c_str(), fmodFlags, 0, &sound);
+	result = FMOD_System_CreateSound(sys, fileName.c_str(), fmodFlags, nullptr, &sound);
 
 	if (result != FMOD_OK) {
 		bLoadedOk = false;
@@ -333,7 +332,7 @@ bool ofxFmodSoundPlayer2::isPlaying() const {
 
 	int playing = 0;
 	FMOD_Channel_IsPlaying(channel, &playing);
-	return (playing != 0 ? true : false);
+	return playing != 0 ? true : false;
 }
 
 //------------------------------------------------------------
@@ -391,9 +390,7 @@ float ofxFmodSoundPlayer2::getPosition() const {
 		}
 		return pct;
 	}
-	else {
-		return 0;
-	}
+	return 0;
 }
 
 //------------------------------------------------------------
@@ -405,9 +402,7 @@ int ofxFmodSoundPlayer2::getPositionMS() const {
 
 		return sampleImAt;
 	}
-	else {
-		return 0;
-	}
+	return 0;
 }
 
 //------------------------------------------------------------
@@ -442,7 +437,7 @@ void ofxFmodSoundPlayer2::setSpeed(float spd) {
 //------------------------------------------------------------
 void ofxFmodSoundPlayer2::setLoop(bool bLp) {
 	if (isPlaying()) {
-		FMOD_Channel_SetMode(channel, (bLp == true) ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF);
+		FMOD_Channel_SetMode(channel, bLp == true ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF);
 	}
 	bLoop = bLp;
 }
@@ -473,7 +468,7 @@ void ofxFmodSoundPlayer2::play() {
 	FMOD_Channel_SetVolume(channel, volume);
 	FMOD_Channel_SetSpeakerMix(channel, levels[0], levels[1], levels[2], levels[3], levels[4], levels[5], levels[6], levels[7]);
 	FMOD_Channel_SetFrequency(channel, internalFreq * speed);
-	FMOD_Channel_SetMode(channel, (bLoop == true) ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF);
+	FMOD_Channel_SetMode(channel, bLoop == true ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF);
 
 	//fmod update() should be called every frame - according to the docs.
 	//we have been using fmod without calling it at all which resulted in channels not being able
@@ -494,7 +489,7 @@ void ofxFmodSoundPlayer2::stop() {
 
 // ----------------------------------------------------------------------------
 
-std::string ofxFmodSoundPlayer2::getFileName() { return fileName; }
+string ofxFmodSoundPlayer2::getFileName() { return fileName; }
 
 // Change one level (to set more than one, use setMix4 or setMix8)
 // index [1..8], value [0..1]
@@ -513,7 +508,7 @@ void ofxFmodSoundPlayer2::setLevel(int index, float level) {
 // Return one level, index [1..8]
 float ofxFmodSoundPlayer2::getLevel(int index) {
 	if (index < 1) return 0;
-	else if (index > 8) return 0;
+	if (index > 8) return 0;
 
 	return levels[index - 1];
 }

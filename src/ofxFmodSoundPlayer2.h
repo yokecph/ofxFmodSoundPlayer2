@@ -5,7 +5,6 @@
 
 extern "C" {
 #include "fmod.h"
-#include "fmod_errors.h"
 }
 
 //		TO DO :
@@ -40,7 +39,6 @@ bool ofxFmodSetDevice(int device);
 
 // --------------------- player functions:
 class ofxFmodSoundPlayer2 {
-
 public:
 
 	ofxFmodSoundPlayer2();
@@ -71,6 +69,15 @@ public:
 	static void initializeFmod();
 	static void closeFmod();
 
+	// Additions:
+	string getFileName();
+	void setLevel(int index, float level);
+	float getLevel(int index);
+
+	void setMix4(float l1, float l2, float l3, float l4);
+	void setMix8(float l1 = 0, float l2 = 0, float l3 = 0, float l4 = 0, float l5 = 0, float l6 = 0, float l7 = 0, float l8 = 0);
+
+private:
 	bool isStreaming;
 	bool bMultiPlay;
 	bool bLoop;
@@ -86,15 +93,7 @@ public:
 	FMOD_CHANNEL* channel;
 	FMOD_SOUND* sound;
 
-	// Additions:
-	std::string getFileName();
-	void setLevel(int index, float level);
-	float getLevel(int index);
-
-	void setMix4(float l1, float l2, float l3, float l4);
-	void setMix8(float l1, float l2, float l3, float l4, float l5, float l6, float l7, float l8);
-
-	std::string fileName;
+	string fileName;
 	bool bIsPlaying; // (stopped or paused means not playing)
 	float levels[8];
 };
